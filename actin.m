@@ -1,21 +1,22 @@
 function actin(T)
 %define initial variables
-%
-W = [0 0 14*pi/18 10 0 0]
+%1-xposition, 2-yposition, 3-angle, 4-length, 5-capped?, 6-life, 7-id#, 8-mother 
+W = [0 0 14*pi/18 10 0 0 1 1]
 A = 1000;
 B = 200;
 C = 200;
 v = 0;
-boundaryxminus = -30;
-boundaryxplus = 30;
-boundaryyminus = -30;
-boundaryyplus = 30;
-Stats = [A B C v size(W,1)];
+boundaryxminus = -100;
+boundaryxplus = 100;
+boundaryyminus = -100;
+boundaryyplus = 100;
+Stats = [A B C v size(W,1) W(1,4)];
 Warray = {W};
-kadd = 9*10^-4;
+kadd = 1.2*10^-3;
 kbranch = 3*10^-5;
 kcap = .0001;
-kvan = 0.0001;
+kvan = 0.001;
+id = 1
 %loop for each individual time step
 for t=1:T
     Aplus = 0;
@@ -48,26 +49,27 @@ for t=1:T
         endpositiony = W(q,2)+W(q,4)*sin(W(q,3));
         if endpositionx > boundaryxplus
                 Lsnip = (boundaryxplus-W(q,1))/cos(W(q,3));
-                W = [W;boundaryxminus,Lsnip*sin(W(q,3))+W(q,2),W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
+                W = [W;boundaryxminus,Lsnip*sin(W(q,3))+W(q,2),W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6),W(q,7),-1*W(q,7)];
                 W(q,4)=Lsnip
-                W(q,5)=t
+                W(q,5)= -1*t
         elseif endpositionx < boundaryyminus
             Lsnip = (boundaryxminus-W(q,1))/cos(W(q,3));
-                W = [W;boundaryxplus,Lsnip*sin(W(q,3))+W(q,2),W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
+            q
+                W = [W;boundaryxplus,Lsnip*sin(W(q,3))+W(q,2),W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6),W(q,7),-1*W(q,7)];
                 W(q,4)=Lsnip
-                W(q,5)=t    
+                W(q,5)= -1*t    
         end
         endpositiony = W(q,2)+W(q,4)*sin(W(q,3));
         if endpositiony > boundaryyplus
             Lsnip = (boundaryyplus-W(q,2))/sin(W(q,3));
-            W = [W; W(q,1)+cos(W(q,3))*Lsnip,boundaryyminus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
+            W = [W; W(q,1)+cos(W(q,3))*Lsnip,boundaryyminus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6),W(q,7),-1*W(q,7)];
             W(q,4) = Lsnip;
-            W(q,5) = t;
+            W(q,5) = -1*t;
         elseif endpositiony < boundaryyminus
             Lsnip = (boundaryyminus-W(q,2))/sin(W(q,3));
-            W = [W; W(q,1)+cos(W(q,3))*Lsnip,boundaryyplus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
+            W = [W; W(q,1)+cos(W(q,3))*Lsnip,boundaryyplus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6), W(q,7),-1*W(q,7)];
             W(q,4) = Lsnip;
-            W(q,5) = t;
+            W(q,5) = -1*t;
         end
              %check if filament branches
         P3 = rand;
@@ -85,22 +87,25 @@ for t=1:T
             else
                 theta = W(q,3)-7*pi/18;
             end
-            W = [W; x y theta 0 0 0];
+            id = id+1;
+            W = [W; x y theta 0 0 0 id W(q,7)];
             end
         end
         % check if filament vanishes
             P2 = rand;
             pvan = 1-exp(-kvan*W(q,6));
              if P2 <= pvan
-                    Bplus = Bplus+1;
+                    if W(q,8) > 0
+                        Bplus = Bplus+1;
+                    end
                     Aplus = Aplus+W(q,4);
                     if W(q,5) > 0
                         Cplus = Cplus + 1;
                     end
                     if size(W,1) == q
-                    W = W(1:(q-1),1:6);
+                    W = W(1:(q-1),1:8);
                     else 
-                    W = [W(1:(q-1),1:6);W((q+1):end,1:6)];
+                    W = [W(1:(q-1),1:8);W((q+1):end,1:8)];
                     end
              end
         end
@@ -109,10 +114,11 @@ for t=1:T
         "the system has collapsed"
         break
     end
+    totalL = sum(W(:,4));
     A=A+Aplus-Aminus;
     B=B+Bplus-Bminus;
     C=C+Cplus-Cminus;
-    Stats = [Stats; A B C v size(W,1)];
+    Stats = [Stats; A B C v size(W,1) totalL];
 end
 Warray
 Stats
