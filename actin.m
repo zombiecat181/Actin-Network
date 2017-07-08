@@ -1,14 +1,15 @@
 function actin(T)
 %define initial variables
-W = [0 0 7*pi/18 10 0 0];
+%
+W = [0 0 14*pi/18 10 0 0]
 A = 1000;
-B = 20;
-C = 20;
+B = 200;
+C = 200;
 v = 0;
-boundaryxminus = -50;
-boundaryxplus = 50;
-boundaryyminus = -50;
-boundaryyplus = 50;
+boundaryxminus = -30;
+boundaryxplus = 30;
+boundaryyminus = -30;
+boundaryyplus = 30;
 Stats = [A B C v size(W,1)];
 Warray = {W};
 kadd = 9*10^-4;
@@ -46,93 +47,25 @@ for t=1:T
         endpositionx = W(q,1)+W(q,4)*cos(W(q,3));
         endpositiony = W(q,2)+W(q,4)*sin(W(q,3));
         if endpositionx > boundaryxplus
-           if endpositiony > boundaryyplus
-                Lsnipx = (boundaryxplus-W(q,1))/cos(W(q,3));
-                Lsnipy = (boundaryyplus-W(q,2))/sin(W(q,3));
-                if Lsnipx > Lsnipy
-                    W = [W;W(q,1)+Lsnipy*cos(W(q,3)),boundaryyminus,W(q,3),Lsnipx-Lsnipy,t,W(q,6)];
-                    ender = W(end,2)+sin(W(end,3))*W(end,4);
-                    W = [W;boundaryxminus,ender,W(q,3),W(q,4)-Lsnipx,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipy;
-                    W(q,5) = t;
-                else
-                    W = [W;boundaryxminus,W(q,2)+sin(W(q,3))*Lsnipx,W(q,3),Lsnipy-Lsnipx,t,W(q,6)];
-                    ender = W(end,1)+cos(W(end,3))*W(end,4);
-                    W = [W;ender,boundaryyminus,W(q,3),W(q,4)-Lsnipy,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipx;
-                    W(q,5) = t;
-                end
-            elseif endpositiony < boundaryyminus
-                Lsnipx = (boundaryxplus-W(q,1))/cos(W(q,3));
-                Lsnipy = (boundaryyminus-W(q,2))/sin(W(q,3));
-                if Lsnipx > Lsnipy
-                    W = [W;W(q,1)+Lsnipy*cos(W(q,3)),boundaryyplus,W(q,3),Lsnipx-Lsnipy,t,W(q,6)];
-                    ender = W(end,2)+sin(W(end,3))*W(end,4);
-                    W = [W;boundaryxminus,ender,W(q,3),W(q,4)-Lsnipx,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipy;
-                    W(q,5) = t;
-                else
-                    W = [W;boundaryxminus,W(q,2)+Lsnipx*sin(W(q,3)),W(q,3),Lsnipy-Lsnipx,t,W(q,6)];
-                    ender = W(end,1)+cos(W(end,3))*W(end,4);
-                    W = [W;ender,boundaryyminus,W(q,3),W(q,4)-Lsnipy,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipx;
-                    W(q,5) = t;
-                end
-            else
                 Lsnip = (boundaryxplus-W(q,1))/cos(W(q,3));
                 W = [W;boundaryxminus,Lsnip*sin(W(q,3))+W(q,2),W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
                 W(q,4)=Lsnip
                 W(q,5)=t
-            end
-        elseif endpositionx < boundaryxminus
-            if endpositiony > boundaryyplus
-                Lsnipx = (boundaryxminus-W(q,1))/cos(W(q,3));
-                Lsnipy = (boundaryyminus-W(q,2))/sin(W(q,3));
-                if Lsnipx > Lsnipy
-                    W = [W;W(q,1)+Lsnipy*cos(W(q,3)),boundaryyminus,W(q,3),Lsnipx-Lsnipy,t,W(q,6)];
-                    ender = W(end,2)+sin(W(end,3))*W(end,4);
-                    W = [W;boundaryxplus,ender,W(q,3),W(q,4)-Lsnipx,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipy;
-                    W(q,5) = t;
-                else
-                    W = [W;boundaryxminus,W(q,2)+sin(W(q,3))*Lsnipx,W(q,3),Lsnipy-Lsnipx,t,W(q,6)];
-                    ender = W(end,1)+cos(W(end,3))*W(end,4);
-                    W = [W;ender,boundaryyminus,W(q,3),W(q,4)-Lsnipy,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipx;
-                    W(q,5) = t;
-                end
-            elseif endpositiony < boundaryyminus
-                Lsnipx = (boundaryxminus-W(q,1))/cos(W(q,3));
-                Lsnipy = (boundaryyminus-W(q,2))/sin(W(q,3));
-                if Lsnipx > Lsnipy
-                    W = [W;W(q,1)+Lsnipy*cos(W(q,3)),boundaryyplus,W(q,3),Lsnipx-Lsnipy,t,W(q,6)];
-                    ender = W(end,2)+sin(W(end,3))*W(end,4);
-                    W = [W;boundaryxplus,ender,W(q,3),W(q,4)-Lsnipx,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipy;
-                    W(q,5) = t;
-                else
-                    W = [W;boundaryxminus,W(q,2)+sin(W(q,3))*Lsnipx,W(q,3),Lsnipy-Lsnipx,t,W(q,6)];
-                    ender = W(end,1)+cos(W(end,3))*W(end,4);
-                    W = [W;ender,boundaryyminus,W(q,3),W(q,4)-Lsnipy,W(q,5),W(q,6)];
-                    W(q,4) = Lsnipx;
-                    W(q,5) = t;
-                end
-            else
-            Lsnip = (-boundaryxminus+W(q,1))/cos(W(q,3));
+        elseif endpositionx < boundaryyminus
+            Lsnip = (boundaryxminus-W(q,1))/cos(W(q,3));
                 W = [W;boundaryxplus,Lsnip*sin(W(q,3))+W(q,2),W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
                 W(q,4)=Lsnip
                 W(q,5)=t    
-            end
         end
         endpositiony = W(q,2)+W(q,4)*sin(W(q,3));
         if endpositiony > boundaryyplus
             Lsnip = (boundaryyplus-W(q,2))/sin(W(q,3));
-            W = [W; W(q,1)+cos(W(q,4))*Lsnip,boundaryyminus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
+            W = [W; W(q,1)+cos(W(q,3))*Lsnip,boundaryyminus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
             W(q,4) = Lsnip;
             W(q,5) = t;
         elseif endpositiony < boundaryyminus
-            Lsnip = (-boundaryyminus+W(q,2))/sin(W(q,3));
-            W = [W; W(q,1)+cos(W(q,4))*Lsnip,boundaryyplus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
+            Lsnip = (boundaryyminus-W(q,2))/sin(W(q,3));
+            W = [W; W(q,1)+cos(W(q,3))*Lsnip,boundaryyplus,W(q,3),W(q,4)-Lsnip,W(q,5),W(q,6)];
             W(q,4) = Lsnip;
             W(q,5) = t;
         end
